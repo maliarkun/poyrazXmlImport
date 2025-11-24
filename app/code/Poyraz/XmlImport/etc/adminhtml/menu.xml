@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!--
+    Adminhtml menu entry.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Poyraz_XmlImport::config" title="Poyraz XML Import" module="Poyraz_XmlImport" sortOrder="100" parent="Magento_Backend::stores_settings" action="adminhtml/system_config/edit/section/poyraz_xml_import" resource="Poyraz_XmlImport::config"/>
+    </menu>
+</config>
