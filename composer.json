@@ -8,7 +8,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Poyraz\\\\XmlImport\\\\": ""
+            "Poyraz\\XmlImport\\": ""
         }
     },
     "version": "1.0.0"

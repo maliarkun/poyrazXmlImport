@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- Default configuration values for Poyraz XML Import -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <poyraz_xml_import>
+            <general>
+                <enabled>1</enabled>
+                <default_attribute_set>4</default_attribute_set>
+                <default_website_code>base</default_website_code>
+                <default_stock_status>1</default_stock_status>
+            </general>
+            <sources>
+                <definitions></definitions>
+                <frequency>*/30 * * * *</frequency>
+            </sources>
+            <mapping>
+                <definitions></definitions>
+            </mapping>
+            <advanced>
+                <image_path>import/poyraz</image_path>
+                <log_level>info</log_level>
+            </advanced>
+        </poyraz_xml_import>
+    </default>
+</config>

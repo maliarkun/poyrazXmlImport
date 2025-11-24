@@ -25,25 +25,22 @@ Magento 2 için geliştirilen bu modül, çoklu XML kaynaklarından ürün veril
    ```
 
 ## Yönetim Paneli Ayarları
-`Stores > Configuration > Poyraz > XML Import` altında dört ana grup bulunur:
+`Stores > Configuration > Poyraz > XML Import` artık Prestashop’taki “Easy Import” akışına benzer üç adımlı bir rehber sunar:
 
-### General Settings
-- **Enable Module:** Modülün genel açık/kapalı durumu.
-- **Default Attribute Set ID:** Ürün oluştururken kullanılacak öntanımlı attribute set ID’si.
-- **Default Website Code:** Kaynak belirtmezse ürünlerin atanacağı website kodu.
-- **Default Stock Status:** Stok bilgisi gelmediğinde kullanılacak varsayılan durum.
-- **Target Currency / TRY to USD / EUR to USD:** Para birimi dönüştürme oranları.
-- **Global Margin Percentage:** Fiyatlara uygulanacak genel marj (örn. 20 → 1.20 çarpanı).
+### Step 1: General Import Rules
+- **Enable module:** Modülün tamamını açıp kapatır; kapalıysa cron ve CLI tetikleri çalışmaz.
+- **Default attribute set / website / stock status:** Yeni ürünler için temel değerler.
 
-### XML Sources
-- **Sources JSON:** Her bir kaynağı `code`, `name`, `url`, `encoding`, `active`, `frequency`, `email`, `currency`, `rate`, `margin` gibi anahtarlarla tanımlayan JSON dizesi. Örnek birden çok kaynak içeren bir dizi yapısı kullanılabilir.
+### Step 2: Sources & Scheduling
+- **Sources JSON:** Her kaynak için `code`, `name`, `url`, `active`, `currency`, `rate`, `margin`, `default_attribute_set`, `image_path`, `frequency` vb. alanları içeren liste. Tooltip içinde hazır bir şablon bulunur.
+- **Default cron frequency:** Kaynak bazında frekans belirtilmediyse kullanılacak zamanlama.
 
-### Mapping
-- **Mapping JSON:** Kaynak kodunu anahtar olarak kullanan, XPath’lerle alan eşleme ve varsa dönüştürücü fonksiyonları içeren JSON. Kategori, resim, stok, fiyat ve attribute eşlemeleri bu yapı üzerinden yönetilir.
+### Step 3: Mapping & Field Guidance
+- **Mapping JSON:** Kaynak kodunu anahtar olarak kullanır. `product_node` ile satır XPath’i, `fields` ile tekil alan eşlemesi, `arrays` ile çoklu değerleri tanımlarsınız. Tooltip örneği stok, fiyat, kategori ve görsel eşleşmelerini gösterir.
 
-### Advanced
-- **Log Level:** Log seviyesi (INFO, DEBUG vb.).
-- **Import Image Path:** `pub/media` altında resimlerin indirileceği göreli klasör.
+### Advanced & Logging
+- **Base image path:** Resimlerin `pub/media` altındaki hedef dizini.
+- **Log level:** Ayrıntı seviyesi.
 
 ## Komut Satırı Kullanımı
 - **Belirli kaynak için import:**
