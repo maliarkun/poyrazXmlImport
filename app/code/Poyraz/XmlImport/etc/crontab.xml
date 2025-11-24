@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+    Cron configuration for XML imports.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="poyraz_xml_import_cron" instance="Poyraz\\XmlImport\\Cron\\Import" method="execute">
+            <schedule>*/30 * * * *</schedule>
+        </job>
+    </group>
+</config>
