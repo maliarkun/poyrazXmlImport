@@ -5,6 +5,8 @@ namespace Poyraz\XmlImport\Logger;
 
 use Monolog\Logger as MonologLogger;
 
-class Logger extends MonologLogger
-{
+if (!class_exists(\Poyraz\XmlImport\Logger\Logger::class, false)) {
+    class Logger extends MonologLogger
+    {
+    }
 }
