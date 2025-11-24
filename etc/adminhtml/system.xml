@@ -1,194 +1,62 @@
 <?xml version="1.0"?>
-<!--
-    System configuration for Poyraz XML Import.
--->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<!-- Admin configuration UI for Poyraz XML Import -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <tab id="poyraz" translate="label" sortOrder="900">
             <label>Poyraz</label>
         </tab>
-
-        <section id="poyraz_xml_import"
-                 translate="label"
-                 sortOrder="10"
-                 showInDefault="1"
-                 showInWebsite="1"
-                 showInStore="1">
+        <section id="poyraz_xml_import" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
             <label>XML Import</label>
             <tab>poyraz</tab>
             <resource>Poyraz_XmlImport::config</resource>
-
-            <!-- Genel ayarlar -->
-            <group id="general"
-                   translate="label comment"
-                   sortOrder="10"
-                   showInDefault="1"
-                   showInWebsite="1"
-                   showInStore="1">
-                <label>General Settings</label>
-
-                <field id="enabled"
-                       translate="label"
-                       type="select"
-                       sortOrder="10"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1"
-                       canRestore="1">
-                    <label>Enable Module</label>
-                    <!-- KENDİ Yes/No source model'imiz -->
-                    <source_model>Poyraz\XmlImport\Model\Config\Source\YesNo</source_model>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Step 1: General Import Rules</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\YesNo">
+                    <label>Enable module</label>
+                    <comment><![CDATA[Modül kapalıysa cron ve CLI importları çalıştırılmaz.]]></comment>
                 </field>
-
-                <field id="default_attribute_set"
-                       translate="label comment"
-                       type="text"
-                       sortOrder="20"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Default Attribute Set ID</label>
-                    <comment>Numeric ID of attribute set to use when creating products.</comment>
+                <field id="default_attribute_set" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default attribute set ID</label>
+                    <comment><![CDATA[Ürün oluşturulurken kullanılacak öntanımlı attribute set.]]></comment>
                 </field>
-
-                <field id="default_website"
-                       translate="label comment"
-                       type="text"
-                       sortOrder="30"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Default Website Code</label>
-                    <comment>Website code for assigning products when source does not specify one.</comment>
+                <field id="default_website_code" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default website code</label>
+                    <comment><![CDATA[Kaynakta website belirtilmezse kullanılacak website kodu.]]></comment>
                 </field>
-
-                <field id="default_stock_status"
-                       translate="label comment"
-                       type="select"
-                       sortOrder="40"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Default Stock Status</label>
-                    <!-- Yine kendi Yes/No source model'imiz -->
-                    <source_model>Poyraz\XmlImport\Model\Config\Source\YesNo</source_model>
-                    <comment>Used when incoming feed lacks stock information.</comment>
-                </field>
-
-                <field id="global_currency"
-                       translate="label comment"
-                       type="text"
-                       sortOrder="50"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Target Currency</label>
-                    <comment>Default currency code (e.g., USD) for conversions.</comment>
-                </field>
-
-                <field id="global_margin"
-                       translate="label comment"
-                       type="text"
-                       sortOrder="60"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Global Margin Percentage</label>
-                    <comment>Example: 20 applies a 1.20 multiplier.</comment>
-                </field>
-
-                <field id="try_to_usd"
-                       translate="label"
-                       type="text"
-                       sortOrder="70"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>TRY to USD rate</label>
-                </field>
-
-                <field id="eur_to_usd"
-                       translate="label"
-                       type="text"
-                       sortOrder="80"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>EUR to USD rate</label>
+                <field id="default_stock_status" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\YesNo">
+                    <label>Default in-stock status</label>
+                    <comment><![CDATA[Stok değeri belirtilmeyen ürünlerin stokta kabul edilip edilmeyeceği.]]></comment>
                 </field>
             </group>
-
-            <!-- Kaynak JSON -->
-            <group id="sources"
-                   translate="label comment"
-                   sortOrder="20"
-                   showInDefault="1"
-                   showInWebsite="1"
-                   showInStore="1">
-                <label>XML Sources</label>
-                <field id="definitions"
-                       translate="label comment"
-                       type="textarea"
-                       sortOrder="10"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
+            <group id="sources" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Step 2: Sources & Scheduling</label>
+                <field id="definitions" translate="label" type="textarea" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Sources JSON</label>
-                    <comment>Define each source as JSON array with keys: code,name,url,encoding,active,frequency,email,currency,rate,margin.</comment>
+                    <comment><![CDATA[Her satır için <code>code</code>, <code>name</code>, <code>url</code>, <code>active</code>, <code>currency</code>, <code>rate</code>, <code>margin</code>, <code>default_attribute_set</code>, <code>image_path</code> vb. değerleri girin. Örnek yapı aşağıdadır:]]></comment>
+                    <tooltip><![CDATA[[{"code":"cengiz_main","name":"Cengiz Balıkçılık (Yeni Ürünleri Ekle)","url":"https://...","active":1,"default_attribute_set":4,"currency":"TRY","target_currency":"USD","rate":0.032,"margin":15,"image_path":"import/poyraz","frequency":"*/30 * * * *"}]]]></tooltip>
+                </field>
+                <field id="frequency" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\Frequency">
+                    <label>Default cron frequency</label>
+                    <comment><![CDATA[Cron tanımı tüm aktif kaynakları bu sıklıkla tetikler. Kaynak bazında <code>frequency</code> tanımı yapılırsa önceliklidir.]]></comment>
                 </field>
             </group>
-
-            <!-- Mapping JSON -->
-            <group id="mapping"
-                   translate="label comment"
-                   sortOrder="30"
-                   showInDefault="1"
-                   showInWebsite="1"
-                   showInStore="1">
-                <label>Mapping</label>
-                <field id="definitions"
-                       translate="label comment"
-                       type="textarea"
-                       sortOrder="10"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
+            <group id="mapping" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Step 3: Mapping & Field Guidance</label>
+                <field id="definitions" translate="label" type="textarea" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Mapping JSON</label>
-                    <comment>JSON keyed by source code. Each source contains field-to-xpath map and transformers.</comment>
+                    <comment><![CDATA[Her kaynak kodu için <code>product_node</code>, <code>fields</code> (tekil XPath) ve <code>arrays</code> (çoklu XPath) anahtarlarını tanımlayın. Prestashop örneğindeki gibi referans, stok, fiyat, kategori ve görsel alanlarını satır satır eşleyebilirsiniz.]]></comment>
+                    <tooltip><![CDATA[{"cengiz_main":{"product_node":"//item","fields":{"sku":"stockCode/text()","name":"label/text()","price":"price1/text()","description":"details/text()","visibility":"4","status":"1"},"arrays":{"categories":"category/text()","images":"picture1Path/text()|picture2Path/text()"}}}]]></tooltip>
                 </field>
             </group>
-
-            <!-- Advanced -->
-            <group id="advanced"
-                   translate="label comment"
-                   sortOrder="40"
-                   showInDefault="1"
-                   showInWebsite="1"
-                   showInStore="1">
-                <label>Advanced</label>
-
-                <field id="log_level"
-                       translate="label"
-                       type="select"
-                       sortOrder="10"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Log Level</label>
-                    <!-- Burada kendi LogLevel source model'imiz kullanılıyor -->
-                    <source_model>Poyraz\XmlImport\Model\Config\Source\LogLevel</source_model>
+            <group id="advanced" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Advanced & Logging</label>
+                <field id="image_path" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base image path</label>
+                    <comment><![CDATA[İndirilen görsellerin kaydedileceği <code>pub/media</code> altındaki göreli dizin.]]></comment>
                 </field>
-
-                <field id="image_path"
-                       translate="label comment"
-                       type="text"
-                       sortOrder="20"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Import Image Path</label>
-                    <comment>Relative path under pub/media for downloaded images.</comment>
+                <field id="log_level" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\LogLevel">
+                    <label>Log level</label>
+                    <comment><![CDATA[Log dosyası için ayrıntı seviyesi.]]></comment>
                 </field>
             </group>
         </section>

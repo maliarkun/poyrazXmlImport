@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace Poyraz\XmlImport\Cron;
 
 use Magento\Framework\HTTP\Client\Curl;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Poyraz\XmlImport\Logger\Logger;
 use Poyraz\XmlImport\Model\Mapping\Config as MappingConfig;
 use Poyraz\XmlImport\Model\Parser\XmlParser;
 use Poyraz\XmlImport\Model\Source\SourceManager;
 use Poyraz\XmlImport\Model\Importer\ProductImporter;
+use Magento\Store\Model\ScopeInterface;
 
 class Import
 {
@@ -18,12 +20,18 @@ class Import
         private readonly ProductImporter $productImporter,
         private readonly MappingConfig $mappingConfig,
         private readonly Curl $curl,
-        private readonly Logger $logger
+        private readonly Logger $logger,
+        private readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
     public function execute(): void
     {
+        if (!$this->isEnabled()) {
+            $this->logger->info('Poyraz XML Import is disabled via configuration.');
+            return;
+        }
+
         foreach ($this->sourceManager->getActiveSources() as $source) {
             $this->processSource($source);
         }
@@ -34,6 +42,11 @@ class Import
         $source = $this->sourceManager->getSourceByCode($sourceCode);
         if ($source === null) {
             $this->logger->warning(sprintf('Source %s not found', $sourceCode));
+            return;
+        }
+
+        if (!$this->isEnabled()) {
+            $this->logger->info('Poyraz XML Import is disabled via configuration.');
             return;
         }
 
@@ -73,5 +86,10 @@ class Import
         } catch (\Throwable $exception) {
             $this->logger->error($exception->getMessage());
         }
+    }
+
+    private function isEnabled(): bool
+    {
+        return (bool)$this->scopeConfig->getValue('poyraz_xml_import/general/enabled', ScopeInterface::SCOPE_STORE);
     }
 }
