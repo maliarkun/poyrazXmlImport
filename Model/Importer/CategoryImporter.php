@@ -3,21 +3,26 @@ declare(strict_types=1);
 
 namespace Poyraz\XmlImport\Model\Importer;
 
-use Magento\Catalog\Api\CategoryLinkManagementInterface;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterfaceFactory;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\StoreManagerInterface;
 use Poyraz\XmlImport\Logger\Logger;
 
 class CategoryImporter
 {
+    /**
+     * @var array<string, int>
+     */
+    private array $cache = [];
+
     public function __construct(
         private readonly CategoryRepositoryInterface $categoryRepository,
         private readonly CategoryInterfaceFactory $categoryFactory,
-        private readonly CategoryLinkManagementInterface $categoryLinkManagement,
-        private readonly CategoryCollectionFactory $categoryCollectionFactory,
+        private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        private readonly FilterBuilder $filterBuilder,
         private readonly StoreManagerInterface $storeManager,
         private readonly Logger $logger
     ) {
@@ -52,19 +57,27 @@ class CategoryImporter
 
     private function getOrCreateCategory(string $name, int $parentId): int
     {
-        // Koleksiyon üzerinden mevcut kategori kontrolü
-        $collection = $this->categoryCollectionFactory->create();
-        $collection->addAttributeToFilter('name', $name);
-        $collection->addAttributeToFilter('parent_id', $parentId);
-        $collection->setPageSize(1);
-
-        $existing = $collection->getFirstItem();
-        if ($existing instanceof CategoryInterface && $existing->getId()) {
-            return (int)$existing->getId();
+        $key = sprintf('%d|%s', $parentId, mb_strtolower($name));
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
         }
 
-        // Yoksa yeni kategori oluştur
-        /** @var \Magento\Catalog\Api\Data\CategoryInterface $category */
+        $this->searchCriteriaBuilder->setFilterGroups([]);
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilters([
+                $this->filterBuilder->setField('name')->setValue($name)->setConditionType('eq')->create(),
+                $this->filterBuilder->setField('parent_id')->setValue($parentId)->setConditionType('eq')->create(),
+            ])
+            ->setPageSize(1)
+            ->create();
+
+        $result = $this->categoryRepository->getList($searchCriteria)->getItems();
+        $existing = reset($result);
+        if ($existing instanceof CategoryInterface && $existing->getId()) {
+            $this->cache[$key] = (int)$existing->getId();
+            return $this->cache[$key];
+        }
+
         $category = $this->categoryFactory->create();
         $category->setName($name);
         $category->setParentId($parentId);
@@ -74,6 +87,7 @@ class CategoryImporter
         $saved = $this->categoryRepository->save($category);
         $this->logger->info(sprintf('Created category %s under %d', $name, $parentId));
 
-        return (int)$saved->getId();
+        $this->cache[$key] = (int)$saved->getId();
+        return $this->cache[$key];
     }
 }

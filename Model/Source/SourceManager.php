@@ -9,7 +9,7 @@ use Poyraz\XmlImport\Logger\Logger;
 
 class SourceManager
 {
-    private const XML_PATH_SOURCES = 'poyraz_xml_import/sources/definitions';
+    public const XML_PATH_SOURCES = 'poyraz_xml_import/sources/definitions';
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
@@ -22,37 +22,27 @@ class SourceManager
      */
     public function getSources(): array
     {
-        $json = (string)$this->scopeConfig->getValue(
-            self::XML_PATH_SOURCES,
-            ScopeInterface::SCOPE_STORE
-        );
-
-        if (trim($json) === '') {
+        $rawJson = (string)$this->scopeConfig->getValue(self::XML_PATH_SOURCES, ScopeInterface::SCOPE_STORE);
+        if (trim($rawJson) === '') {
             return [];
         }
 
-        $decoded = json_decode($json, true);
+        $decoded = json_decode($rawJson, true);
         if (!is_array($decoded)) {
-            $this->logger->error('Cannot decode source definitions JSON', ['raw' => $json]);
+            $this->logger->error('Cannot decode source definitions JSON', ['raw' => $rawJson]);
             return [];
         }
 
-        // Tek obje mi, liste mi kontrol et
-        if (function_exists('array_is_list') && array_is_list($decoded)) {
-            $sources = $decoded;
-        } else {
-            // Tek obje geldiği durumda onu listeye sar
-            $sources = [$decoded];
-        }
+        $sources = function_exists('array_is_list') && array_is_list($decoded) ? $decoded : [$decoded];
 
-        return array_values(
-            array_filter(
-                $sources,
-                static function ($source): bool {
-                    return is_array($source) && !empty($source['code']);
-                }
-            )
-        );
+        $filtered = array_values(array_filter($sources, static function (mixed $source): bool {
+            return is_array($source) && trim((string)($source['code'] ?? '')) !== '';
+        }));
+
+        return array_map(function (array $source): array {
+            $source['code'] = (string)$source['code'];
+            return $source;
+        }, $filtered);
     }
 
     /**
@@ -60,23 +50,15 @@ class SourceManager
      */
     public function getActiveSources(): array
     {
-        return array_values(
-            array_filter(
-                $this->getSources(),
-                static function ($source): bool {
-                    return is_array($source) && !empty($source['active']);
-                }
-            )
-        );
+        return array_values(array_filter($this->getSources(), static function (array $source): bool {
+            $flag = $source['is_active'] ?? $source['active'] ?? false;
+            return (bool)$flag;
+        }));
     }
 
     public function getSourceByCode(string $code): ?array
     {
         foreach ($this->getSources() as $source) {
-            if (!is_array($source) || empty($source['code'])) {
-                continue;
-            }
-
             if (strcasecmp((string)$source['code'], $code) === 0) {
                 return $source;
             }
