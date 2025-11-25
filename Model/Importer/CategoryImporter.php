@@ -7,7 +7,7 @@ use Magento\Catalog\Api\CategoryLinkManagementInterface;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterfaceFactory;
-use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Poyraz\XmlImport\Logger\Logger;
 
@@ -17,7 +17,7 @@ class CategoryImporter
         private readonly CategoryRepositoryInterface $categoryRepository,
         private readonly CategoryInterfaceFactory $categoryFactory,
         private readonly CategoryLinkManagementInterface $categoryLinkManagement,
-        private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        private readonly CategoryCollectionFactory $categoryCollectionFactory,
         private readonly StoreManagerInterface $storeManager,
         private readonly Logger $logger
     ) {
@@ -31,14 +31,17 @@ class CategoryImporter
     {
         $ids = [];
         $rootId = (int)$this->storeManager->getStore()->getRootCategoryId();
+
         foreach ($categoryPaths as $path) {
             $segments = array_filter(array_map('trim', explode('/', $path)));
             $parentId = $rootId;
             $categoryId = $rootId;
+
             foreach ($segments as $segment) {
                 $categoryId = $this->getOrCreateCategory($segment, $parentId);
                 $parentId = $categoryId;
             }
+
             if ($categoryId) {
                 $ids[] = $categoryId;
             }
@@ -49,21 +52,25 @@ class CategoryImporter
 
     private function getOrCreateCategory(string $name, int $parentId): int
     {
-        $criteria = $this->searchCriteriaBuilder
-            ->addFilter(CategoryInterface::KEY_NAME, $name)
-            ->addFilter('parent_id', $parentId)
-            ->create();
-        $results = $this->categoryRepository->getList($criteria)->getItems();
-        $existing = current($results);
-        if ($existing instanceof CategoryInterface) {
+        // Koleksiyon üzerinden mevcut kategori kontrolü
+        $collection = $this->categoryCollectionFactory->create();
+        $collection->addAttributeToFilter('name', $name);
+        $collection->addAttributeToFilter('parent_id', $parentId);
+        $collection->setPageSize(1);
+
+        $existing = $collection->getFirstItem();
+        if ($existing instanceof CategoryInterface && $existing->getId()) {
             return (int)$existing->getId();
         }
 
+        // Yoksa yeni kategori oluştur
+        /** @var \Magento\Catalog\Api\Data\CategoryInterface $category */
         $category = $this->categoryFactory->create();
         $category->setName($name);
         $category->setParentId($parentId);
         $category->setIsActive(true);
         $category->setIncludeInMenu(true);
+
         $saved = $this->categoryRepository->save($category);
         $this->logger->info(sprintf('Created category %s under %d', $name, $parentId));
 

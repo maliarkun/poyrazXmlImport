@@ -1,64 +1,221 @@
 <?xml version="1.0"?>
-<!-- Admin configuration UI for Poyraz XML Import -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
+        <!-- Üst sekme -->
         <tab id="poyraz" translate="label" sortOrder="900">
             <label>Poyraz</label>
         </tab>
-        <section id="poyraz_xml_import" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+
+        <!-- Ana bölüm -->
+        <section id="poyraz_xml_import"
+                 translate="label"
+                 type="text"
+                 sortOrder="10"
+                 showInDefault="1"
+                 showInWebsite="0"
+                 showInStore="0">
             <label>XML Import</label>
             <tab>poyraz</tab>
             <resource>Poyraz_XmlImport::config</resource>
-            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+
+            <!-- STEP 1: GENERAL -->
+            <group id="general"
+                   translate="label"
+                   type="text"
+                   sortOrder="10"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
                 <label>Step 1: General Import Rules</label>
-                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\YesNo">
+
+                <field id="enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1"
+                       source_model="Poyraz\XmlImport\Model\Config\Source\YesNo">
                     <label>Enable module</label>
-                    <comment><![CDATA[Modül kapalıysa cron ve CLI importları çalıştırılmaz.]]></comment>
+                    <comment><![CDATA[
+Modül aktif değilse hem cron hem de CLI üzerinden hiçbir XML kaynağı işlenmez.
+Import işlemlerini kullanmak için bu alanı "Yes" olarak ayarlayın.
+                    ]]></comment>
                 </field>
-                <field id="default_attribute_set" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+
+                <field id="default_attribute_set"
+                       translate="label"
+                       type="text"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Default attribute set ID</label>
-                    <comment><![CDATA[Ürün oluşturulurken kullanılacak öntanımlı attribute set.]]></comment>
+                    <comment><![CDATA[
+Yeni oluşturulan ürünler için varsayılan attribute set ID.
+Kaynak tanımlarında ayrı bir attribute set belirtilmezse bu değer kullanılır.
+Magento admin’den Products / Catalog ekranında bir ürün seçip attribute set ID’sini öğrenebilirsiniz.
+                    ]]></comment>
                 </field>
-                <field id="default_website_code" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+
+                <field id="default_website_code"
+                       translate="label"
+                       type="text"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Default website code</label>
-                    <comment><![CDATA[Kaynakta website belirtilmezse kullanılacak website kodu.]]></comment>
+                    <comment><![CDATA[
+Kaynak JSON’unda website bilgisi yoksa ürünler bu website code altında oluşturulur.
+Genellikle "base" veya sisteminizde tanımlı diğer website kodları kullanılır.
+                    ]]></comment>
                 </field>
-                <field id="default_stock_status" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\YesNo">
+
+                <field id="default_stock_status"
+                       translate="label"
+                       type="select"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1"
+                       source_model="Poyraz\XmlImport\Model\Config\Source\YesNo">
                     <label>Default in-stock status</label>
-                    <comment><![CDATA[Stok değeri belirtilmeyen ürünlerin stokta kabul edilip edilmeyeceği.]]></comment>
+                    <comment><![CDATA[
+XML içinde stok bilgisi olmayan ürünlerin stokta kabul edilip edilmeyeceğini belirler.
+"Yes" seçerseniz stok değeri olmayan ürünler stokta ("in stock") varsayılır.
+                    ]]></comment>
                 </field>
             </group>
-            <group id="sources" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Step 2: Sources & Scheduling</label>
-                <field id="definitions" translate="label" type="textarea" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+
+            <!-- STEP 2: SOURCES -->
+            <group id="sources"
+                   translate="label"
+                   type="text"
+                   sortOrder="20"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Step 2: Sources &amp; Scheduling</label>
+
+                <field id="definitions"
+                       translate="label"
+                       type="textarea"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Sources JSON</label>
-                    <comment><![CDATA[Her satır için <code>code</code>, <code>name</code>, <code>url</code>, <code>active</code>, <code>currency</code>, <code>rate</code>, <code>margin</code>, <code>default_attribute_set</code>, <code>image_path</code> vb. değerleri girin. Örnek yapı aşağıdadır:]]></comment>
-                    <tooltip><![CDATA[[{"code":"cengiz_main","name":"Cengiz Balıkçılık (Yeni Ürünleri Ekle)","url":"https://...","active":1,"default_attribute_set":4,"currency":"TRY","target_currency":"USD","rate":0.032,"margin":15,"image_path":"import/poyraz","frequency":"*/30 * * * *"}]]]></tooltip>
+                    <comment><![CDATA[
+Her satır bir XML kaynağını temsil eden bir JSON nesnesidir.
+Örnek olarak aşağıdaki alanları kullanabilirsiniz:
+- code          : Kaynağın benzersiz kodu (ör: cengiz_main)
+- name          : Kaynağın görünen adı
+- url           : XML dosyasının tam adresi
+- active        : 1 ise aktif, 0 ise pasif
+- currency      : Kaynak fiyat para birimi (ör: TRY)
+- target_currency : Magento tarafındaki hedef para birimi (opsiyonel)
+- rate          : Kur çarpanı (opsiyonel)
+- margin        : Yüzde marj (opsiyonel)
+- default_attribute_set : Bu kaynak için özel attribute set ID (opsiyonel)
+- image_path    : Resimlerin kaydedileceği dizin (pub/media altında göreli yol)
+- frequency     : İsteğe bağlı cron sıklığı, global ayarı override eder.
+                    ]]></comment>
                 </field>
-                <field id="frequency" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\Frequency">
+
+                <field id="frequency"
+                       translate="label"
+                       type="select"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1"
+                       source_model="Poyraz\XmlImport\Model\Config\Source\Frequency">
                     <label>Default cron frequency</label>
-                    <comment><![CDATA[Cron tanımı tüm aktif kaynakları bu sıklıkla tetikler. Kaynak bazında <code>frequency</code> tanımı yapılırsa önceliklidir.]]></comment>
+                    <comment><![CDATA[
+Genel cron çalışma sıklığını belirtir. Bu değer, tüm aktif kaynakların
+varsayılan olarak hangi aralıkla çalıştırılacağını belirler.
+Eğer bir kaynak JSON’unda ayrıca "frequency" alanı belirtilmişse,
+o kaynak için burada seçilen değer yerine kendi değeri kullanılır.
+                    ]]></comment>
                 </field>
             </group>
-            <group id="mapping" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Step 3: Mapping & Field Guidance</label>
-                <field id="definitions" translate="label" type="textarea" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+
+            <!-- STEP 3: MAPPING -->
+            <group id="mapping"
+                   translate="label"
+                   type="text"
+                   sortOrder="30"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Step 3: Mapping &amp; Field Guidance</label>
+
+                <field id="definitions"
+                       translate="label"
+                       type="textarea"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Mapping JSON</label>
-                    <comment><![CDATA[Her kaynak kodu için <code>product_node</code>, <code>fields</code> (tekil XPath) ve <code>arrays</code> (çoklu XPath) anahtarlarını tanımlayın. Prestashop örneğindeki gibi referans, stok, fiyat, kategori ve görsel alanlarını satır satır eşleyebilirsiniz.]]></comment>
-                    <tooltip><![CDATA[{"cengiz_main":{"product_node":"//item","fields":{"sku":"stockCode/text()","name":"label/text()","price":"price1/text()","description":"details/text()","visibility":"4","status":"1"},"arrays":{"categories":"category/text()","images":"picture1Path/text()|picture2Path/text()"}}}]]></tooltip>
+                    <comment><![CDATA[
+Burada her kaynak kodu için ürün düğümünü ve alan eşleştirmelerini tanımlarsınız.
+Temel yapı:
+- product_node : Her bir ürünü temsil eden XML düğümünün XPath ifadesi.
+- fields       : Tekil alanlar için (sku, name, price, description vb.) XPath eşleştirmeleri.
+- arrays       : Birden fazla değer dönen alanlar (kategori listesi, birden fazla görsel vb.) için XPath ifadeleri.
+
+Örneğin fields içinde sku, name, price alanları için ilgili XML alanlarının
+text() ifadelerini kullanabilir; arrays içinde categories ve images gibi
+çoklu değere sahip alanları tanımlayabilirsiniz.
+                    ]]></comment>
                 </field>
             </group>
-            <group id="advanced" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Advanced & Logging</label>
-                <field id="image_path" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+
+            <!-- ADVANCED -->
+            <group id="advanced"
+                   translate="label"
+                   type="text"
+                   sortOrder="40"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Advanced &amp; Logging</label>
+
+                <field id="image_path"
+                       translate="label"
+                       type="text"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Base image path</label>
-                    <comment><![CDATA[İndirilen görsellerin kaydedileceği <code>pub/media</code> altındaki göreli dizin.]]></comment>
+                    <comment><![CDATA[
+İndirilen ürün görsellerinin kaydedileceği dizin.
+Sadece pub/media altında kullanılacak göreli yolu yazın.
+Örneğin: import/poyraz
+                    ]]></comment>
                 </field>
-                <field id="log_level" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" source_model="Poyraz\XmlImport\Model\Config\Source\LogLevel">
+
+                <field id="log_level"
+                       translate="label"
+                       type="select"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1"
+                       source_model="Poyraz\XmlImport\Model\Config\Source\LogLevel">
                     <label>Log level</label>
-                    <comment><![CDATA[Log dosyası için ayrıntı seviyesi.]]></comment>
+                    <comment><![CDATA[
+Log dosyasına yazılacak detay seviyesini belirler.
+Daha düşük seviyelerde yalnızca hata mesajları,
+daha yüksek seviyelerde bilgi ve debug mesajları da kaydedilir.
+                    ]]></comment>
                 </field>
             </group>
+
         </section>
     </system>
 </config>

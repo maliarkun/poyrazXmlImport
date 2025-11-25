@@ -1,17 +1,33 @@
 <?xml version="1.0"?>
 <!-- Dependency injection configuration -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Poyraz\\XmlImport\\Logger\\Logger">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Logger tanımı -->
+    <type name="Poyraz\XmlImport\Logger\Logger">
         <arguments>
             <argument name="name" xsi:type="string">poyraz_xml_import</argument>
             <argument name="handlers" xsi:type="array">
-                <item name="poyraz_xml_handler" xsi:type="object">Poyraz\\XmlImport\\Logger\\Handler</item>
+                <item name="poyraz_xml_handler" xsi:type="object">Poyraz\XmlImport\Logger\Handler</item>
             </argument>
         </arguments>
     </type>
-    <type name="Poyraz\\XmlImport\\Logger\\Handler">
+
+    <!-- Logger handler -->
+    <type name="Poyraz\XmlImport\Logger\Handler">
         <arguments>
             <argument name="fileName" xsi:type="string">/var/log/poyraz_xml.log</argument>
         </arguments>
     </type>
+
+    <!-- CLI komutları -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="poyraz_xml_import" xsi:type="object">Poyraz\XmlImport\Console\ImportCommand</item>
+                <item name="poyraz_xml_import_all" xsi:type="object">Poyraz\XmlImport\Console\ImportAllCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
 </config>
